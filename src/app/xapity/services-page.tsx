@@ -8,7 +8,7 @@ interface Service {
   description: string;
   category?: string;
 }
-//hola
+
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
   const [showForm, setShowForm] = useState(false);
