@@ -9,6 +9,7 @@ import {
   ChartLine,
   Megaphone,
   Camera,
+  CalendarDays,
   Users,
 } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
@@ -157,6 +158,16 @@ const data = {
       title: 'Servicios',
       url: '/services',
       icon: BookOpen,
+    },
+    {
+      title: 'Staff',
+      url: '/staff',
+      icon: Users,
+    },
+    {
+      title: 'Agenda',
+      url: '/schedule',
+      icon: CalendarDays,
     },
     {
       title: 'Vision',

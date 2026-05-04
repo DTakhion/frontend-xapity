@@ -1,0 +1,965 @@
+// import { useEffect, useState } from "react"
+// import { Plus, Pencil, Trash } from "lucide-react"
+
+// import { Button } from "@/components/ui/button"
+// import { Card, CardContent } from "@/components/ui/card"
+// import { Badge } from "@/components/ui/badge"
+// import {
+//     Table,
+//     TableBody,
+//     TableCell,
+//     TableHead,
+//     TableHeader,
+//     TableRow,
+// } from "@/components/ui/table"
+// import {
+//     Dialog,
+//     DialogContent,
+//     DialogDescription,
+//     DialogFooter,
+//     DialogHeader,
+//     DialogTitle,
+// } from "@/components/ui/dialog"
+// import { Input } from "@/components/ui/input"
+// import { Label } from "@/components/ui/label"
+
+// const API_URL = import.meta.env.VITE_XAPITY_API_URL
+
+// interface WorkingHourBlock {
+//     start: string
+//     end: string
+// }
+
+// interface WorkingHours {
+//     monday?: WorkingHourBlock[]
+//     tuesday?: WorkingHourBlock[]
+//     wednesday?: WorkingHourBlock[]
+//     thursday?: WorkingHourBlock[]
+//     friday?: WorkingHourBlock[]
+//     saturday?: WorkingHourBlock[]
+//     sunday?: WorkingHourBlock[]
+// }
+
+// interface Staff {
+//     id: string
+//     name: string
+//     role: string
+//     email?: string | null
+//     phone?: string | null
+//     specialties?: string[]
+//     serviceIds?: string[]
+//     notes?: string | null
+//     workingHours?: WorkingHours
+//     isActive?: boolean
+//     isDeleted?: boolean
+// }
+
+// const emptyForm = {
+//     name: "",
+//     role: "",
+//     email: "",
+//     phone: "",
+//     specialties: "",
+//     serviceIds: "",
+//     notes: "",
+//     mondayStart: "09:00",
+//     mondayEnd: "18:00",
+// }
+
+// export default function StaffPage() {
+//     const [staff, setStaff] = useState<Staff[]>([])
+//     const [showCreateDialog, setShowCreateDialog] = useState(false)
+//     const [formData, setFormData] = useState(emptyForm)
+
+//     useEffect(() => {
+//         fetchStaff()
+//     }, [])
+
+//     const fetchStaff = async () => {
+//         try {
+//             const res = await fetch(`${API_URL}/staff`)
+//             const data = await res.json()
+
+//             setStaff(
+//                 data.items.map((s: any) => ({
+//                     id: s.staffId,
+//                     name: s.name,
+//                     role: s.role,
+//                     email: s.email,
+//                     phone: s.phone,
+//                     specialties: s.specialties || [],
+//                     serviceIds: s.serviceIds || [],
+//                     notes: s.notes,
+//                     workingHours: s.workingHours || {},
+//                     isActive: s.isActive,
+//                     isDeleted: s.isDeleted,
+//                 }))
+//             )
+//         } catch (error) {
+//             console.error("Error fetching staff:", error)
+//         }
+//     }
+
+//     const splitCommaValues = (value: string) =>
+//         value
+//             .split(",")
+//             .map((item) => item.trim())
+//             .filter(Boolean)
+
+//     const handleCreate = async () => {
+//         if (!formData.name || !formData.role) return
+
+//         const payload = {
+//             name: formData.name,
+//             role: formData.role,
+//             email: formData.email || null,
+//             phone: formData.phone || null,
+//             specialties: splitCommaValues(formData.specialties),
+//             serviceIds: splitCommaValues(formData.serviceIds),
+//             notes: formData.notes || null,
+//             workingHours: {
+//                 monday: {
+//                     isWorking: true,
+//                     blocks: [
+//                         {
+//                             start: formData.mondayStart,
+//                             end: formData.mondayEnd,
+//                         },
+//                     ],
+//                 },
+//             },
+//         }
+
+//         try {
+//             const res = await fetch(`${API_URL}/staff`, {
+//                 method: "POST",
+//                 headers: {
+//                     "Content-Type": "application/json",
+//                 },
+//                 body: JSON.stringify(payload),
+//             })
+
+//             if (!res.ok) {
+//                 const errorData = await res.json()
+//                 console.error("Error creating staff:", errorData)
+//                 return
+//             }
+
+//             await fetchStaff()
+//             setFormData(emptyForm)
+//             setShowCreateDialog(false)
+//         } catch (error) {
+//             console.error("Error creating staff:", error)
+//         }
+//     }
+
+//     return (
+//         <div className="p-6 space-y-6">
+//             <div className="flex justify-between items-center">
+//                 <div>
+//                     <h1 className="text-2xl font-bold">Staff</h1>
+//                     <p className="text-sm text-muted-foreground">
+//                         Gestiona el equipo disponible para atender servicios y futuras reservas
+//                     </p>
+//                 </div>
+
+//                 <Button onClick={() => setShowCreateDialog(true)}>
+//                     <Plus className="w-4 h-4 mr-2" />
+//                     Crear Staff
+//                 </Button>
+//             </div>
+
+//             {staff.length === 0 && (
+//                 <Card>
+//                     <CardContent className="flex flex-col items-center justify-center py-12">
+//                         <p className="text-muted-foreground mb-4">
+//                             No hay miembros del staff creados
+//                         </p>
+//                         <Button onClick={() => setShowCreateDialog(true)}>
+//                             <Plus className="w-4 h-4 mr-2" />
+//                             Crear primer staff
+//                         </Button>
+//                     </CardContent>
+//                 </Card>
+//             )}
+
+//             {staff.length > 0 && (
+//                 <Card>
+//                     <CardContent className="p-0">
+//                         <Table>
+//                             <TableHeader>
+//                                 <TableRow>
+//                                     <TableHead>Staff</TableHead>
+//                                     <TableHead>Rol</TableHead>
+//                                     <TableHead>Contacto</TableHead>
+//                                     <TableHead>Especialidades</TableHead>
+//                                     <TableHead>Estado</TableHead>
+//                                     <TableHead className="text-right">Acciones</TableHead>
+//                                 </TableRow>
+//                             </TableHeader>
+
+//                             <TableBody>
+//                                 {staff.map((s) => (
+//                                     <TableRow key={s.id}>
+//                                         <TableCell>
+//                                             <div className="flex flex-col">
+//                                                 <span className="font-medium">{s.name}</span>
+//                                                 <span className="text-xs text-muted-foreground">
+//                                                     {s.notes || "Sin notas registradas"}
+//                                                 </span>
+//                                             </div>
+//                                         </TableCell>
+
+//                                         <TableCell>
+//                                             <Badge variant="secondary">{s.role}</Badge>
+//                                         </TableCell>
+
+//                                         <TableCell>
+//                                             <div className="flex flex-col text-sm">
+//                                                 <span>{s.email || "Sin email"}</span>
+//                                                 <span className="text-xs text-muted-foreground">
+//                                                     {s.phone || "Sin teléfono"}
+//                                                 </span>
+//                                             </div>
+//                                         </TableCell>
+
+//                                         <TableCell>
+//                                             {s.specialties && s.specialties.length > 0 ? (
+//                                                 <div className="flex flex-wrap gap-1">
+//                                                     {s.specialties.map((specialty) => (
+//                                                         <Badge key={specialty} variant="outline">
+//                                                             {specialty}
+//                                                         </Badge>
+//                                                     ))}
+//                                                 </div>
+//                                             ) : (
+//                                                 <span className="text-sm text-muted-foreground">
+//                                                     Sin especialidades
+//                                                 </span>
+//                                             )}
+//                                         </TableCell>
+
+//                                         <TableCell>
+//                                             {s.isActive ? (
+//                                                 <Badge className="bg-green-500">Activo</Badge>
+//                                             ) : (
+//                                                 <Badge variant="outline">Inactivo</Badge>
+//                                             )}
+//                                         </TableCell>
+
+//                                         <TableCell className="text-right space-x-2">
+//                                             <Button size="icon" variant="outline" disabled>
+//                                                 <Pencil className="w-4 h-4" />
+//                                             </Button>
+
+//                                             <Button size="icon" variant="destructive" disabled>
+//                                                 <Trash className="w-4 h-4" />
+//                                             </Button>
+//                                         </TableCell>
+//                                     </TableRow>
+//                                 ))}
+//                             </TableBody>
+//                         </Table>
+//                     </CardContent>
+//                 </Card>
+//             )}
+
+//             <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+//                 <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+//                     <DialogHeader>
+//                         <DialogTitle>Crear Staff</DialogTitle>
+//                         <DialogDescription>
+//                             Registra un nuevo integrante del equipo para asociarlo luego a servicios y disponibilidad.
+//                         </DialogDescription>
+//                     </DialogHeader>
+
+//                     <div className="space-y-6">
+//                         <div className="rounded-xl border p-4 space-y-4">
+//                             <div>
+//                                 <h3 className="font-semibold">Información principal</h3>
+//                                 <p className="text-sm text-muted-foreground">
+//                                     Datos básicos del integrante del equipo.
+//                                 </p>
+//                             </div>
+
+//                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                                 <div>
+//                                     <Label>Nombre</Label>
+//                                     <Input
+//                                         value={formData.name}
+//                                         onChange={(e) =>
+//                                             setFormData({ ...formData, name: e.target.value })
+//                                         }
+//                                         placeholder="Ej: Juan Pérez"
+//                                     />
+//                                 </div>
+
+//                                 <div>
+//                                     <Label>Rol</Label>
+//                                     <Input
+//                                         value={formData.role}
+//                                         onChange={(e) =>
+//                                             setFormData({ ...formData, role: e.target.value })
+//                                         }
+//                                         placeholder="Ej: Barbero, Terapeuta, Profesional"
+//                                     />
+//                                 </div>
+//                             </div>
+//                         </div>
+
+//                         <div className="rounded-xl border p-4 space-y-4">
+//                             <div>
+//                                 <h3 className="font-semibold">Contacto</h3>
+//                                 <p className="text-sm text-muted-foreground">
+//                                     Información opcional para comunicación interna o futura agenda.
+//                                 </p>
+//                             </div>
+
+//                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                                 <div>
+//                                     <Label>Email</Label>
+//                                     <Input
+//                                         value={formData.email}
+//                                         onChange={(e) =>
+//                                             setFormData({ ...formData, email: e.target.value })
+//                                         }
+//                                         placeholder="Ej: juan@correo.cl"
+//                                     />
+//                                 </div>
+
+//                                 <div>
+//                                     <Label>Teléfono</Label>
+//                                     <Input
+//                                         value={formData.phone}
+//                                         onChange={(e) =>
+//                                             setFormData({ ...formData, phone: e.target.value })
+//                                         }
+//                                         placeholder="Ej: +56912345678"
+//                                     />
+//                                 </div>
+//                             </div>
+//                         </div>
+
+//                         <div className="rounded-xl border p-4 space-y-4">
+//                             <div>
+//                                 <h3 className="font-semibold">Especialidades y servicios</h3>
+//                                 <p className="text-sm text-muted-foreground">
+//                                     Escribe valores separados por coma. Los servicios pueden quedar vacíos por ahora.
+//                                 </p>
+//                             </div>
+
+//                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                                 <div>
+//                                     <Label>Especialidades</Label>
+//                                     <Input
+//                                         value={formData.specialties}
+//                                         onChange={(e) =>
+//                                             setFormData({ ...formData, specialties: e.target.value })
+//                                         }
+//                                         placeholder="Corte, barba, coloración"
+//                                     />
+//                                 </div>
+
+//                                 <div>
+//                                     <Label>Service IDs asociados</Label>
+//                                     <Input
+//                                         value={formData.serviceIds}
+//                                         onChange={(e) =>
+//                                             setFormData({ ...formData, serviceIds: e.target.value })
+//                                         }
+//                                         placeholder="srv_123, srv_456"
+//                                     />
+//                                 </div>
+//                             </div>
+//                         </div>
+
+//                         <div className="rounded-xl border p-4 space-y-4">
+//                             <div>
+//                                 <h3 className="font-semibold">Disponibilidad inicial</h3>
+//                                 <p className="text-sm text-muted-foreground">
+//                                     Por ahora dejamos una disponibilidad base para lunes. Luego podemos expandirlo a toda la semana.
+//                                 </p>
+//                             </div>
+
+//                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                                 <div>
+//                                     <Label>Inicio lunes</Label>
+//                                     <Input
+//                                         type="time"
+//                                         value={formData.mondayStart}
+//                                         onChange={(e) =>
+//                                             setFormData({ ...formData, mondayStart: e.target.value })
+//                                         }
+//                                     />
+//                                 </div>
+
+//                                 <div>
+//                                     <Label>Fin lunes</Label>
+//                                     <Input
+//                                         type="time"
+//                                         value={formData.mondayEnd}
+//                                         onChange={(e) =>
+//                                             setFormData({ ...formData, mondayEnd: e.target.value })
+//                                         }
+//                                     />
+//                                 </div>
+//                             </div>
+//                         </div>
+
+//                         <div className="rounded-xl border p-4 space-y-4">
+//                             <div>
+//                                 <h3 className="font-semibold">Notas internas</h3>
+//                                 <p className="text-sm text-muted-foreground">
+//                                     Comentarios visibles para administración.
+//                                 </p>
+//                             </div>
+
+//                             <Input
+//                                 value={formData.notes}
+//                                 onChange={(e) =>
+//                                     setFormData({ ...formData, notes: e.target.value })
+//                                 }
+//                                 placeholder="Ej: Atiende clientes preferentes"
+//                             />
+//                         </div>
+//                     </div>
+
+//                     <DialogFooter className="sticky bottom-0 bg-background pt-4 border-t">
+//                         <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+//                             Cancelar
+//                         </Button>
+//                         <Button onClick={handleCreate}>Crear Staff</Button>
+//                     </DialogFooter>
+//                 </DialogContent>
+//             </Dialog>
+//         </div>
+//     )
+// }
+
+import { useEffect, useState } from "react"
+import { Plus, Pencil, Trash, X } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/ui/table"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+
+const API_URL = import.meta.env.VITE_XAPITY_API_URL
+
+interface WorkingHourBlock {
+    start: string
+    end: string
+}
+
+interface WorkingDay {
+    isWorking: boolean
+    blocks: WorkingHourBlock[]
+}
+
+interface WorkingHours {
+    monday?: WorkingDay
+    tuesday?: WorkingDay
+    wednesday?: WorkingDay
+    thursday?: WorkingDay
+    friday?: WorkingDay
+    saturday?: WorkingDay
+    sunday?: WorkingDay
+}
+
+interface Staff {
+    id: string
+    name: string
+    role: string
+    email?: string | null
+    phone?: string | null
+    specialties?: string[]
+    serviceIds?: string[]
+    notes?: string | null
+    workingHours?: WorkingHours
+    isActive?: boolean
+    isDeleted?: boolean
+}
+
+interface ServiceOption {
+    id: string
+    name: string
+}
+
+const emptyForm = {
+    name: "",
+    role: "",
+    email: "",
+    phone: "",
+    specialties: "",
+    serviceIds: [] as string[],
+    notes: "",
+    mondayStart: "09:00",
+    mondayEnd: "18:00",
+}
+
+export default function StaffPage() {
+    const [staff, setStaff] = useState<Staff[]>([])
+    const [services, setServices] = useState<ServiceOption[]>([])
+    const [showCreateDialog, setShowCreateDialog] = useState(false)
+    const [formData, setFormData] = useState(emptyForm)
+
+    useEffect(() => {
+        fetchStaff()
+        fetchServices()
+    }, [])
+
+    const fetchStaff = async () => {
+        try {
+            const res = await fetch(`${API_URL}/staff`)
+            const data = await res.json()
+
+            setStaff(
+                data.items.map((s: any) => ({
+                    id: s.staffId,
+                    name: s.name,
+                    role: s.role,
+                    email: s.email,
+                    phone: s.phone,
+                    specialties: s.specialties || [],
+                    serviceIds: s.serviceIds || [],
+                    notes: s.notes,
+                    workingHours: s.workingHours || {},
+                    isActive: s.isActive,
+                    isDeleted: s.isDeleted,
+                }))
+            )
+        } catch (error) {
+            console.error("Error fetching staff:", error)
+        }
+    }
+
+    const fetchServices = async () => {
+        try {
+            const res = await fetch(`${API_URL}/services`)
+            const data = await res.json()
+
+            setServices(
+                data.items.map((s: any) => ({
+                    id: s.serviceId,
+                    name: s.name,
+                }))
+            )
+        } catch (error) {
+            console.error("Error fetching services:", error)
+        }
+    }
+
+    const splitCommaValues = (value: string) =>
+        value
+            .split(",")
+            .map((item) => item.trim())
+            .filter(Boolean)
+
+    const getServiceNameById = (serviceId: string) => {
+        return services.find((service) => service.id === serviceId)?.name || serviceId
+    }
+
+    const handleAddService = (serviceId: string) => {
+        if (!serviceId) return
+
+        if (formData.serviceIds.includes(serviceId)) return
+
+        setFormData({
+            ...formData,
+            serviceIds: [...formData.serviceIds, serviceId],
+        })
+    }
+
+    const handleRemoveService = (serviceId: string) => {
+        setFormData({
+            ...formData,
+            serviceIds: formData.serviceIds.filter((id) => id !== serviceId),
+        })
+    }
+
+    const handleCreate = async () => {
+        if (!formData.name || !formData.role) return
+
+        const payload = {
+            name: formData.name,
+            role: formData.role,
+            email: formData.email || null,
+            phone: formData.phone || null,
+            specialties: splitCommaValues(formData.specialties),
+            serviceIds: formData.serviceIds,
+            notes: formData.notes || null,
+            workingHours: {
+                monday: {
+                    isWorking: true,
+                    blocks: [
+                        {
+                            start: formData.mondayStart,
+                            end: formData.mondayEnd,
+                        },
+                    ],
+                },
+            },
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/staff`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            })
+
+            if (!res.ok) {
+                const errorData = await res.json()
+                console.error("Error creating staff:", errorData)
+                return
+            }
+
+            await fetchStaff()
+            setFormData(emptyForm)
+            setShowCreateDialog(false)
+        } catch (error) {
+            console.error("Error creating staff:", error)
+        }
+    }
+
+    return (
+        <div className="p-6 space-y-6">
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-2xl font-bold">Staff</h1>
+                    <p className="text-sm text-muted-foreground">
+                        Gestiona el equipo disponible para atender servicios y futuras reservas
+                    </p>
+                </div>
+
+                <Button onClick={() => setShowCreateDialog(true)}>
+                    <Plus className="w-4 h-4 mr-2" />
+                    Crear Staff
+                </Button>
+            </div>
+
+            {staff.length === 0 && (
+                <Card>
+                    <CardContent className="flex flex-col items-center justify-center py-12">
+                        <p className="text-muted-foreground mb-4">
+                            No hay miembros del staff creados
+                        </p>
+                        <Button onClick={() => setShowCreateDialog(true)}>
+                            <Plus className="w-4 h-4 mr-2" />
+                            Crear primer staff
+                        </Button>
+                    </CardContent>
+                </Card>
+            )}
+
+            {staff.length > 0 && (
+                <Card>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Staff</TableHead>
+                                    <TableHead>Rol</TableHead>
+                                    <TableHead>Contacto</TableHead>
+                                    <TableHead>Especialidades</TableHead>
+                                    <TableHead>Estado</TableHead>
+                                    <TableHead className="text-right">Acciones</TableHead>
+                                </TableRow>
+                            </TableHeader>
+
+                            <TableBody>
+                                {staff.map((s) => (
+                                    <TableRow key={s.id}>
+                                        <TableCell>
+                                            <div className="flex flex-col">
+                                                <span className="font-medium">{s.name}</span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {s.notes || "Sin notas registradas"}
+                                                </span>
+                                            </div>
+                                        </TableCell>
+
+                                        <TableCell>
+                                            <Badge variant="secondary">{s.role}</Badge>
+                                        </TableCell>
+
+                                        <TableCell>
+                                            <div className="flex flex-col text-sm">
+                                                <span>{s.email || "Sin email"}</span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {s.phone || "Sin teléfono"}
+                                                </span>
+                                            </div>
+                                        </TableCell>
+
+                                        <TableCell>
+                                            {s.specialties && s.specialties.length > 0 ? (
+                                                <div className="flex flex-wrap gap-1">
+                                                    {s.specialties.map((specialty) => (
+                                                        <Badge key={specialty} variant="outline">
+                                                            {specialty}
+                                                        </Badge>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <span className="text-sm text-muted-foreground">
+                                                    Sin especialidades
+                                                </span>
+                                            )}
+                                        </TableCell>
+
+                                        <TableCell>
+                                            {s.isActive ? (
+                                                <Badge className="bg-green-500">Activo</Badge>
+                                            ) : (
+                                                <Badge variant="outline">Inactivo</Badge>
+                                            )}
+                                        </TableCell>
+
+                                        <TableCell className="text-right space-x-2">
+                                            <Button size="icon" variant="outline" disabled>
+                                                <Pencil className="w-4 h-4" />
+                                            </Button>
+
+                                            <Button size="icon" variant="destructive" disabled>
+                                                <Trash className="w-4 h-4" />
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            )}
+
+            <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+                <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Crear Staff</DialogTitle>
+                        <DialogDescription>
+                            Registra un nuevo integrante del equipo para asociarlo luego a servicios y disponibilidad.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="space-y-6">
+                        <div className="rounded-xl border p-4 space-y-4">
+                            <div>
+                                <h3 className="font-semibold">Información principal</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Datos básicos del integrante del equipo.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <Label>Nombre</Label>
+                                    <Input
+                                        value={formData.name}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, name: e.target.value })
+                                        }
+                                        placeholder="Ej: Juan Pérez"
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label>Rol</Label>
+                                    <Input
+                                        value={formData.role}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, role: e.target.value })
+                                        }
+                                        placeholder="Ej: Barbero, Terapeuta, Profesional"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl border p-4 space-y-4">
+                            <div>
+                                <h3 className="font-semibold">Contacto</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Información opcional para comunicación interna o futura agenda.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <Label>Email</Label>
+                                    <Input
+                                        value={formData.email}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, email: e.target.value })
+                                        }
+                                        placeholder="Ej: juan@correo.cl"
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label>Teléfono</Label>
+                                    <Input
+                                        value={formData.phone}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, phone: e.target.value })
+                                        }
+                                        placeholder="Ej: +56912345678"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl border p-4 space-y-4">
+                            <div>
+                                <h3 className="font-semibold">Especialidades y servicios</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Escribe especialidades separadas por coma y selecciona los servicios asociados.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <Label>Especialidades</Label>
+                                    <Input
+                                        value={formData.specialties}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, specialties: e.target.value })
+                                        }
+                                        placeholder="Corte, barba, coloración"
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label>Servicios asociados</Label>
+
+                                    <select
+                                        className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                                        value=""
+                                        onChange={(e) => handleAddService(e.target.value)}
+                                    >
+                                        <option value="">
+                                            Selecciona un servicio
+                                        </option>
+
+                                        {services.map((service) => (
+                                            <option
+                                                key={service.id}
+                                                value={service.id}
+                                                disabled={formData.serviceIds.includes(service.id)}
+                                            >
+                                                {service.name}
+                                            </option>
+                                        ))}
+                                    </select>
+
+                                    {formData.serviceIds.length > 0 && (
+                                        <div className="flex flex-wrap gap-2 mt-3">
+                                            {formData.serviceIds.map((serviceId) => (
+                                                <Badge
+                                                    key={serviceId}
+                                                    variant="secondary"
+                                                    className="flex items-center gap-1"
+                                                >
+                                                    {getServiceNameById(serviceId)}
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveService(serviceId)}
+                                                        className="ml-1 rounded-full hover:opacity-70"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </Badge>
+                                            ))}
+                                        </div>
+                                    )}
+
+                                    {services.length === 0 && (
+                                        <p className="text-xs text-muted-foreground mt-2">
+                                            No hay servicios disponibles todavía.
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl border p-4 space-y-4">
+                            <div>
+                                <h3 className="font-semibold">Disponibilidad inicial</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Por ahora dejamos una disponibilidad base para lunes. Luego podemos expandirlo a toda la semana.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <Label>Inicio lunes</Label>
+                                    <Input
+                                        type="time"
+                                        value={formData.mondayStart}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, mondayStart: e.target.value })
+                                        }
+                                    />
+                                </div>
+
+                                <div>
+                                    <Label>Fin lunes</Label>
+                                    <Input
+                                        type="time"
+                                        value={formData.mondayEnd}
+                                        onChange={(e) =>
+                                            setFormData({ ...formData, mondayEnd: e.target.value })
+                                        }
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="rounded-xl border p-4 space-y-4">
+                            <div>
+                                <h3 className="font-semibold">Notas internas</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Comentarios visibles para administración.
+                                </p>
+                            </div>
+
+                            <Input
+                                value={formData.notes}
+                                onChange={(e) =>
+                                    setFormData({ ...formData, notes: e.target.value })
+                                }
+                                placeholder="Ej: Atiende clientes preferentes"
+                            />
+                        </div>
+                    </div>
+
+                    <DialogFooter className="sticky bottom-0 bg-background pt-4 border-t">
+                        <Button variant="outline" onClick={() => setShowCreateDialog(false)}>
+                            Cancelar
+                        </Button>
+                        <Button onClick={handleCreate}>Crear Staff</Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+        </div>
+    )
+}
