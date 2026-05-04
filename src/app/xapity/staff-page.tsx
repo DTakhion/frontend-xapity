@@ -1,5 +1,5 @@
 // import { useEffect, useState } from "react"
-// import { Plus, Pencil, Trash } from "lucide-react"
+// import { Plus, Pencil, Trash, X } from "lucide-react"
 
 // import { Button } from "@/components/ui/button"
 // import { Card, CardContent } from "@/components/ui/card"
@@ -30,14 +30,19 @@
 //     end: string
 // }
 
+// interface WorkingDay {
+//     isWorking: boolean
+//     blocks: WorkingHourBlock[]
+// }
+
 // interface WorkingHours {
-//     monday?: WorkingHourBlock[]
-//     tuesday?: WorkingHourBlock[]
-//     wednesday?: WorkingHourBlock[]
-//     thursday?: WorkingHourBlock[]
-//     friday?: WorkingHourBlock[]
-//     saturday?: WorkingHourBlock[]
-//     sunday?: WorkingHourBlock[]
+//     monday?: WorkingDay
+//     tuesday?: WorkingDay
+//     wednesday?: WorkingDay
+//     thursday?: WorkingDay
+//     friday?: WorkingDay
+//     saturday?: WorkingDay
+//     sunday?: WorkingDay
 // }
 
 // interface Staff {
@@ -54,13 +59,18 @@
 //     isDeleted?: boolean
 // }
 
+// interface ServiceOption {
+//     id: string
+//     name: string
+// }
+
 // const emptyForm = {
 //     name: "",
 //     role: "",
 //     email: "",
 //     phone: "",
 //     specialties: "",
-//     serviceIds: "",
+//     serviceIds: [] as string[],
 //     notes: "",
 //     mondayStart: "09:00",
 //     mondayEnd: "18:00",
@@ -68,11 +78,13 @@
 
 // export default function StaffPage() {
 //     const [staff, setStaff] = useState<Staff[]>([])
+//     const [services, setServices] = useState<ServiceOption[]>([])
 //     const [showCreateDialog, setShowCreateDialog] = useState(false)
 //     const [formData, setFormData] = useState(emptyForm)
 
 //     useEffect(() => {
 //         fetchStaff()
+//         fetchServices()
 //     }, [])
 
 //     const fetchStaff = async () => {
@@ -100,11 +112,49 @@
 //         }
 //     }
 
+//     const fetchServices = async () => {
+//         try {
+//             const res = await fetch(`${API_URL}/services`)
+//             const data = await res.json()
+
+//             setServices(
+//                 data.items.map((s: any) => ({
+//                     id: s.serviceId,
+//                     name: s.name,
+//                 }))
+//             )
+//         } catch (error) {
+//             console.error("Error fetching services:", error)
+//         }
+//     }
+
 //     const splitCommaValues = (value: string) =>
 //         value
 //             .split(",")
 //             .map((item) => item.trim())
 //             .filter(Boolean)
+
+//     const getServiceNameById = (serviceId: string) => {
+//         return services.find((service) => service.id === serviceId)?.name || serviceId
+//     }
+
+//     const handleAddService = (serviceId: string) => {
+//         if (!serviceId) return
+
+//         if (formData.serviceIds.includes(serviceId)) return
+
+//         setFormData({
+//             ...formData,
+//             serviceIds: [...formData.serviceIds, serviceId],
+//         })
+//     }
+
+//     const handleRemoveService = (serviceId: string) => {
+//         setFormData({
+//             ...formData,
+//             serviceIds: formData.serviceIds.filter((id) => id !== serviceId),
+//         })
+//     }
 
 //     const handleCreate = async () => {
 //         if (!formData.name || !formData.role) return
@@ -115,7 +165,7 @@
 //             email: formData.email || null,
 //             phone: formData.phone || null,
 //             specialties: splitCommaValues(formData.specialties),
-//             serviceIds: splitCommaValues(formData.serviceIds),
+//             serviceIds: formData.serviceIds,
 //             notes: formData.notes || null,
 //             workingHours: {
 //                 monday: {
@@ -344,7 +394,7 @@
 //                             <div>
 //                                 <h3 className="font-semibold">Especialidades y servicios</h3>
 //                                 <p className="text-sm text-muted-foreground">
-//                                     Escribe valores separados por coma. Los servicios pueden quedar vacíos por ahora.
+//                                     Escribe especialidades separadas por coma y selecciona los servicios asociados.
 //                                 </p>
 //                             </div>
 
@@ -361,14 +411,54 @@
 //                                 </div>
 
 //                                 <div>
-//                                     <Label>Service IDs asociados</Label>
-//                                     <Input
-//                                         value={formData.serviceIds}
-//                                         onChange={(e) =>
-//                                             setFormData({ ...formData, serviceIds: e.target.value })
-//                                         }
-//                                         placeholder="srv_123, srv_456"
-//                                     />
+//                                     <Label>Servicios asociados</Label>
+
+//                                     <select
+//                                         className="mt-1 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+//                                         value=""
+//                                         onChange={(e) => handleAddService(e.target.value)}
+//                                     >
+//                                         <option value="">
+//                                             Selecciona un servicio
+//                                         </option>
+
+//                                         {services.map((service) => (
+//                                             <option
+//                                                 key={service.id}
+//                                                 value={service.id}
+//                                                 disabled={formData.serviceIds.includes(service.id)}
+//                                             >
+//                                                 {service.name}
+//                                             </option>
+//                                         ))}
+//                                     </select>
+
+//                                     {formData.serviceIds.length > 0 && (
+//                                         <div className="flex flex-wrap gap-2 mt-3">
+//                                             {formData.serviceIds.map((serviceId) => (
+//                                                 <Badge
+//                                                     key={serviceId}
+//                                                     variant="secondary"
+//                                                     className="flex items-center gap-1"
+//                                                 >
+//                                                     {getServiceNameById(serviceId)}
+//                                                     <button
+//                                                         type="button"
+//                                                         onClick={() => handleRemoveService(serviceId)}
+//                                                         className="ml-1 rounded-full hover:opacity-70"
+//                                                     >
+//                                                         <X className="w-3 h-3" />
+//                                                     </button>
+//                                                 </Badge>
+//                                             ))}
+//                                         </div>
+//                                     )}
+
+//                                     {services.length === 0 && (
+//                                         <p className="text-xs text-muted-foreground mt-2">
+//                                             No hay servicios disponibles todavía.
+//                                         </p>
+//                                     )}
 //                                 </div>
 //                             </div>
 //                         </div>
@@ -502,6 +592,44 @@ interface ServiceOption {
     name: string
 }
 
+// ============================================================
+// Días de la semana soportados por el formulario.
+// Importante:
+// - Las keys deben coincidir con las esperadas por el backend.
+// - Usamos nombres en inglés para mantener consistencia con schemas/staff.py.
+// ============================================================
+const weekDays = [
+    { key: "monday", label: "Lunes" },
+    { key: "tuesday", label: "Martes" },
+    { key: "wednesday", label: "Miércoles" },
+    { key: "thursday", label: "Jueves" },
+    { key: "friday", label: "Viernes" },
+    { key: "saturday", label: "Sábado" },
+    { key: "sunday", label: "Domingo" },
+] as const
+
+type WeekDayKey = (typeof weekDays)[number]["key"]
+
+// ============================================================
+// Disponibilidad por defecto para creación de staff.
+// Observación:
+// - Lunes a viernes activos.
+// - Sábado y domingo desactivados, pero con horas base listas.
+// - Si un día está desactivado, se enviará con blocks: [].
+// ============================================================
+const defaultWorkingHoursForm: Record<
+    WeekDayKey,
+    { isWorking: boolean; start: string; end: string }
+> = {
+    monday: { isWorking: true, start: "09:00", end: "18:00" },
+    tuesday: { isWorking: true, start: "09:00", end: "18:00" },
+    wednesday: { isWorking: true, start: "09:00", end: "18:00" },
+    thursday: { isWorking: true, start: "09:00", end: "18:00" },
+    friday: { isWorking: true, start: "09:00", end: "18:00" },
+    saturday: { isWorking: false, start: "09:00", end: "14:00" },
+    sunday: { isWorking: false, start: "09:00", end: "14:00" },
+}
+
 const emptyForm = {
     name: "",
     role: "",
@@ -510,8 +638,7 @@ const emptyForm = {
     specialties: "",
     serviceIds: [] as string[],
     notes: "",
-    mondayStart: "09:00",
-    mondayEnd: "18:00",
+    workingHours: defaultWorkingHoursForm,
 }
 
 export default function StaffPage() {
@@ -578,7 +705,6 @@ export default function StaffPage() {
 
     const handleAddService = (serviceId: string) => {
         if (!serviceId) return
-
         if (formData.serviceIds.includes(serviceId)) return
 
         setFormData({
@@ -594,6 +720,27 @@ export default function StaffPage() {
         })
     }
 
+    // ============================================================
+    // Actualiza un día específico de la disponibilidad semanal.
+    // Esto permite activar/desactivar días y modificar sus horas.
+    // ============================================================
+    const updateWorkingDay = (
+        day: WeekDayKey,
+        field: "isWorking" | "start" | "end",
+        value: boolean | string
+    ) => {
+        setFormData({
+            ...formData,
+            workingHours: {
+                ...formData.workingHours,
+                [day]: {
+                    ...formData.workingHours[day],
+                    [field]: value,
+                },
+            },
+        })
+    }
+
     const handleCreate = async () => {
         if (!formData.name || !formData.role) return
 
@@ -605,17 +752,40 @@ export default function StaffPage() {
             specialties: splitCommaValues(formData.specialties),
             serviceIds: formData.serviceIds,
             notes: formData.notes || null,
-            workingHours: {
-                monday: {
-                    isWorking: true,
-                    blocks: [
+
+            // =====================================================
+            // Payload compatible con backend:
+            // workingHours: {
+            //   monday: {
+            //     isWorking: true,
+            //     blocks: [{ start: "09:00", end: "18:00" }]
+            //   },
+            //   saturday: {
+            //     isWorking: false,
+            //     blocks: []
+            //   }
+            // }
+            // =====================================================
+            workingHours: Object.fromEntries(
+                weekDays.map(({ key }) => {
+                    const day = formData.workingHours[key]
+
+                    return [
+                        key,
                         {
-                            start: formData.mondayStart,
-                            end: formData.mondayEnd,
+                            isWorking: day.isWorking,
+                            blocks: day.isWorking
+                                ? [
+                                      {
+                                          start: day.start,
+                                          end: day.end,
+                                      },
+                                  ]
+                                : [],
                         },
-                    ],
-                },
-            },
+                    ]
+                })
+            ),
         }
 
         try {
@@ -856,9 +1026,7 @@ export default function StaffPage() {
                                         value=""
                                         onChange={(e) => handleAddService(e.target.value)}
                                     >
-                                        <option value="">
-                                            Selecciona un servicio
-                                        </option>
+                                        <option value="">Selecciona un servicio</option>
 
                                         {services.map((service) => (
                                             <option
@@ -903,34 +1071,62 @@ export default function StaffPage() {
 
                         <div className="rounded-xl border p-4 space-y-4">
                             <div>
-                                <h3 className="font-semibold">Disponibilidad inicial</h3>
+                                <h3 className="font-semibold">Disponibilidad semanal</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Por ahora dejamos una disponibilidad base para lunes. Luego podemos expandirlo a toda la semana.
+                                    Define los días y horarios en que este integrante estará disponible para futuras reservas.
                                 </p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <Label>Inicio lunes</Label>
-                                    <Input
-                                        type="time"
-                                        value={formData.mondayStart}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, mondayStart: e.target.value })
-                                        }
-                                    />
-                                </div>
+                            <div className="space-y-3">
+                                {weekDays.map(({ key, label }) => {
+                                    const day = formData.workingHours[key]
 
-                                <div>
-                                    <Label>Fin lunes</Label>
-                                    <Input
-                                        type="time"
-                                        value={formData.mondayEnd}
-                                        onChange={(e) =>
-                                            setFormData({ ...formData, mondayEnd: e.target.value })
-                                        }
-                                    />
-                                </div>
+                                    return (
+                                        <div
+                                            key={key}
+                                            className="grid grid-cols-1 md:grid-cols-[140px_1fr_1fr] gap-4 items-end rounded-lg border p-3"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={day.isWorking}
+                                                    onChange={(e) =>
+                                                        updateWorkingDay(
+                                                            key,
+                                                            "isWorking",
+                                                            e.target.checked
+                                                        )
+                                                    }
+                                                />
+                                                <Label>{label}</Label>
+                                            </div>
+
+                                            <div>
+                                                <Label>Inicio</Label>
+                                                <Input
+                                                    type="time"
+                                                    value={day.start}
+                                                    disabled={!day.isWorking}
+                                                    onChange={(e) =>
+                                                        updateWorkingDay(key, "start", e.target.value)
+                                                    }
+                                                />
+                                            </div>
+
+                                            <div>
+                                                <Label>Fin</Label>
+                                                <Input
+                                                    type="time"
+                                                    value={day.end}
+                                                    disabled={!day.isWorking}
+                                                    onChange={(e) =>
+                                                        updateWorkingDay(key, "end", e.target.value)
+                                                    }
+                                                />
+                                            </div>
+                                        </div>
+                                    )
+                                })}
                             </div>
                         </div>
 
