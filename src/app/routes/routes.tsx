@@ -7,7 +7,7 @@ import { CampaignsPage } from '@/app/campaigns/campaigns-page';
 import { ClientsPage } from '@/app/clients/clients-page';
 import { SignupLoading } from '../signup/signup-loading';
 import { SignupForm1 } from '../signup/pages/signup-form1';
-import { SignupForm2 } from '../signup/pages/signup-form2';
+//import { SignupForm2 } from '../signup/pages/signup-form2';
 import SegmentacionPage from '@/app/clients/segmentacion-page';
 import { SegmentacionCanastasPage } from '@/app/clients/segmentacion-canastas-page';
 import XapityPage from '@/app/xapity/xapity-page';
@@ -22,6 +22,7 @@ export const router = createBrowserRouter([
     path: '/',
     Component: RootLayout,
     children: [
+      
       { index: true, path: '', Component: KpisPage },
       { path: 'campaigns', Component: CampaignsPage },
       { path: 'campaigns/recommendation-favorite', Component: RecommendationPage },
@@ -40,9 +41,11 @@ export const router = createBrowserRouter([
     path: '/auth-flow',
     Component: AuthFlowLayout,
     children: [
-      { index: true, path: '', Component: SignupLoading },
+      { index: true, Component: SignupForm1 },
       { path: 'signup', Component: SignupForm1 },
-      { path: 'signup-continue', Component: SignupForm2 },
+      //{ index: true, path: '', Component: SignupLoading },
+      //{ path: 'signup', Component: SignupForm1 },
+      //{ path: 'signup-continue', Component: SignupForm2 },
       { path: 'signup-resend-email-verification', Component: () => <>Resend email verification</> },
       { path: 'password-reset', Component: () => <>Password reset</> },
       { path: 'password-reset-continue', Component: () => <>Continue password</> },
