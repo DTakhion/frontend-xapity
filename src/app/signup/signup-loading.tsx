@@ -41,10 +41,12 @@ export function SignupLoading() {
       navigate(`/auth-flow/password-reset?mode=${mode}&oobCode=${oobCode}`, { replace: true });
       return;
     }
-    if (mode === 'verifyEmail' && oobCode) {
-      handleEmailVerification(auth, oobCode);
+    if (!auth) {
+      console.warn('[Firebase] auth no disponible para verificación de email');
       return;
     }
+
+    handleEmailVerification(auth, oobCode);
   }, []);
 
   return (

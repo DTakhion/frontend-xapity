@@ -33,3 +33,9 @@ pnpm-debug.log*
 *.mp4
 *.mov
 *.avi
+
+# Firebase cache
+.firebase/
+
+# Local env
+.env
