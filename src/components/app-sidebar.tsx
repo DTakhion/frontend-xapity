@@ -2,15 +2,12 @@ import * as React from 'react';
 import {
   BookOpen,
   Bot,
-  Frame,
-  Map,
-  PieChart,
-  Settings2,
   ChartLine,
   Megaphone,
   Camera,
   CalendarDays,
   Users,
+  ShieldCheck,
 } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -23,6 +20,24 @@ import {
   SidebarRail,
 } from '@/components/ui/sidebar';
 import companyLogo from '@/assets/images/company_02.png';
+import { getCurrentUser } from '@/lib/auth';
+
+//const CURRENT_CLIENT = 'maf';
+
+const moduleVisibility = {
+  maf: ['xapity-maf'],
+  default: [
+    'kpis',
+    'campaigns',
+    'clients',
+    'xapity',
+    'xapity-maf',
+    'services',
+    'staff',
+    'schedule',
+    'vision',
+  ],
+} as const;
 
 const data = {
   user: {
@@ -79,6 +94,7 @@ const data = {
   ],
   navMain: [
     {
+      moduleKey: 'kpis',
       title: 'KPIs',
       url: '/',
       icon: ChartLine,
@@ -95,6 +111,7 @@ const data = {
       ],
     },
     {
+      moduleKey: 'campaigns',
       title: 'Campañas',
       url: '',
       isActive: true,
@@ -111,6 +128,7 @@ const data = {
       ],
     },
     {
+      moduleKey: 'clients',
       title: 'Clientes',
       url: '',
       icon: Users,
@@ -130,90 +148,40 @@ const data = {
       ],
     },
     {
-      title: 'Modelos',
-      url: '#',
-      icon: Bot,
-      disabled: false,
-      items: [
-        {
-          title: 'Genesis',
-          url: '#',
-        },
-        {
-          title: 'Explorer',
-          url: '#',
-        },
-        {
-          title: 'Quantum',
-          url: '#',
-        },
-      ],
-    },
-    {
+      moduleKey: 'xapity',
       title: 'Xapity',
       url: '/xapity',
       icon: Bot,
     },
     {
+      moduleKey: 'xapity-maf',
+      title: 'Xapity MAF',
+      url: '/xapity-maf',
+      icon: ShieldCheck,
+    },
+    {
+      moduleKey: 'services',
       title: 'Servicios',
       url: '/services',
       icon: BookOpen,
     },
     {
+      moduleKey: 'staff',
       title: 'Staff',
       url: '/staff',
       icon: Users,
     },
     {
+      moduleKey: 'schedule',
       title: 'Agenda',
       url: '/schedule',
       icon: CalendarDays,
     },
     {
+      moduleKey: 'vision',
       title: 'Vision',
       url: '/vision',
       icon: Camera,
-    },
-    {
-      title: 'Settings',
-      url: '#',
-      icon: Settings2,
-      disabled: true,
-      items: [
-        {
-          title: 'General',
-          url: '#',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Billing',
-          url: '#',
-        },
-        {
-          title: 'Limits',
-          url: '#',
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
     },
   ],
 };
@@ -221,6 +189,18 @@ const data = {
 type SidebarProps = React.ComponentProps<typeof Sidebar>;
 
 export function AppSidebar({ ...props }: SidebarProps) {
+  const currentUser = getCurrentUser();
+
+  const currentClient =
+    currentUser?.businessId === 'maf' ? 'maf' : 'default';
+
+  const visibleModules =
+    moduleVisibility[currentClient as keyof typeof moduleVisibility] ??
+    moduleVisibility.default;
+
+  const visibleNavMain = data.navMain.filter((item) =>
+    visibleModules.includes(item.moduleKey as any)
+  );
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -228,7 +208,7 @@ export function AppSidebar({ ...props }: SidebarProps) {
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={data.navMain} />
+        <NavMain items={visibleNavMain} />
       </SidebarContent>
 
       <SidebarFooter>

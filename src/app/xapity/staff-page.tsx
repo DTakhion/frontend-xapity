@@ -248,11 +248,11 @@ export default function StaffPage() {
                             isWorking: day.isWorking,
                             blocks: day.isWorking
                                 ? [
-                                      {
-                                          start: day.start,
-                                          end: day.end,
-                                      },
-                                  ]
+                                    {
+                                        start: day.start,
+                                        end: day.end,
+                                    },
+                                ]
                                 : [],
                         },
                     ]
@@ -280,6 +280,30 @@ export default function StaffPage() {
             setShowCreateDialog(false)
         } catch (error) {
             console.error("Error creating staff:", error)
+        }
+    }
+
+    const handleDelete = async (staffId: string) => {
+        const confirmed = window.confirm(
+            "¿Seguro que deseas eliminar este miembro del staff?"
+        )
+
+        if (!confirmed) return
+
+        try {
+            const res = await fetch(`${API_URL}/staff/${staffId}`, {
+                method: "DELETE",
+            })
+
+            if (!res.ok) {
+                const errorData = await res.json()
+                console.error("Error deleting staff:", errorData)
+                return
+            }
+
+            await fetchStaff()
+        } catch (error) {
+            console.error("Error deleting staff:", error)
         }
     }
 
@@ -382,7 +406,11 @@ export default function StaffPage() {
                                                 <Pencil className="w-4 h-4" />
                                             </Button>
 
-                                            <Button size="icon" variant="destructive" disabled>
+                                            <Button
+                                                size="icon"
+                                                variant="destructive"
+                                                onClick={() => handleDelete(s.id)}
+                                            >
                                                 <Trash className="w-4 h-4" />
                                             </Button>
                                         </TableCell>
