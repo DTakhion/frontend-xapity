@@ -11,6 +11,7 @@ import { SignupForm1 } from '../signup/pages/signup-form1';
 import SegmentacionPage from '@/app/clients/segmentacion-page';
 import { SegmentacionCanastasPage } from '@/app/clients/segmentacion-canastas-page';
 import XapityPage from '@/app/xapity/xapity-page';
+import XapityMafPage from '@/app/xapity-maf/xapity-maf-page';
 import ServicesPage from '../xapity/services-page';
 import StaffPage from '@/app/xapity/staff-page';
 import SchedulePage from '@/app/xapity/schedule-page';
@@ -30,6 +31,7 @@ export const router = createBrowserRouter([
       { path: 'clientes/segmentacion', Component: SegmentacionPage },
       { path: 'clients/segmentacion-canastas', Component: SegmentacionCanastasPage },
       { path: 'xapity', Component: XapityPage },
+      { path: 'xapity-maf', Component: XapityMafPage },
       { path: 'services', Component: ServicesPage },
       { path: 'staff', Component: StaffPage },
       { path: 'schedule', Component: SchedulePage },
