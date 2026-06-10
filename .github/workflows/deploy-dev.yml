@@ -22,7 +22,7 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Build frontend DEV
-        run: yarn build
+        run: yarn build --mode dev
 
       - name: Deploy to Firebase Hosting DEV
         run: npx firebase-tools deploy --only hosting --project xapity-45d11 --token "${{ secrets.FIREBASE_TOKEN }}"
