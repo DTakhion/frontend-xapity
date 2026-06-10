@@ -58,7 +58,7 @@ export function LoginForm({ className, ...props }: DivProps) {
       await toast.promise(loginUser, {
         loading: 'Ingresando...',
         success: () => {
-          navigate('/');
+          navigate('/xapity');
           return {
             message: 'Bienvenido!',
             description: 'Acceso correcto a Xapity',
@@ -145,6 +145,15 @@ export function LoginForm({ className, ...props }: DivProps) {
                     type="password"
                   />
 
+                  <div className="flex justify-end">
+                    <NavLink
+                      to="/auth-flow/password-reset"
+                      className="text-sm font-medium underline underline-offset-4"
+                    >
+                      ¿Olvidaste tu contraseña?
+                    </NavLink>
+                  </div>
+
                   <Button
                     disabled={form.formState.isSubmitting}
                     className="mt-2 h-12 w-full rounded-xl"
@@ -173,7 +182,7 @@ export function LoginForm({ className, ...props }: DivProps) {
                 <NavLink to="/auth-flow/signup" className="font-medium underline underline-offset-4">
                   Crear cuenta
                 </NavLink>
-                
+
               </div>
             </div>
           </section>
