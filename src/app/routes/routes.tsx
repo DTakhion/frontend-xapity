@@ -20,6 +20,8 @@ import XapityMafPage from '@/app/xapity-maf/xapity-maf-page';
 import ServicesPage from '../xapity/services-page';
 import StaffPage from '@/app/xapity/staff-page';
 import SchedulePage from '@/app/xapity/schedule-page';
+import InvitationsPage from '@/app/xapity/invitations-page';
+import { AcceptInvitationForm } from '../signup/pages/accept-invitation-form';
 
 import VisionPage from '@/app/vision/VisionPage';
 
@@ -51,6 +53,10 @@ export const router = createBrowserRouter([
       { path: 'services', Component: ServicesPage },
       { path: 'staff', Component: StaffPage },
       { path: 'schedule', Component: SchedulePage },
+      { path: 'invitations', Component: InvitationsPage },
+      { path: 'accept-invitation',
+        Component: AcceptInvitationForm,
+      },
 
       { path: 'vision', Component: VisionPage },
     ],

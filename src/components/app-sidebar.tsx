@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { TeamSwitcher } from '@/components/team-switcher';
+import { UserPlus } from 'lucide-react';
+//import { TeamSwitcher } from '@/components/team-switcher';
 import {
   Sidebar,
   SidebarContent,
@@ -25,73 +26,77 @@ import { getCurrentUser } from '@/lib/auth';
 //const CURRENT_CLIENT = 'maf';
 
 const moduleVisibility = {
-  maf: ['xapity-maf'],
+  maf: ['xapity-maf', 'invitations'],
   default: [
     'kpis',
     'campaigns',
     'clients',
     'xapity',
-    'xapity-maf',
     'services',
     'staff',
     'schedule',
     'vision',
+    'invitations',
   ],
+} as const;
+
+const enabledModulesByClient = {
+  default: ['xapity', 'xapity-maf', 'services', 'staff', 'schedule','invitations'],
 } as const;
 
 const data = {
   user: {
-    name: 'Takhion',
-    email: 'contacto@takhion.com',
+    name: 'Usuario',
+    email: '',
     avatar: '/avatars/shadcn.jpg',
   },
-  teams: [
-    {
-      name: 'Takhion Inc',
-      logo: () => (
-        <img
-          src={companyLogo}
-          alt="Takhion Inc"
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: '100%',
-          }}
-        />
-      ),
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: () => (
-        <img
-          src={companyLogo}
-          alt="Takhion Inc"
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: '100%',
-          }}
-        />
-      ),
-      plan: 'Startup',
-    },
-    {
-      name: 'Takhion Corp.',
-      logo: () => (
-        <img
-          src={companyLogo}
-          alt="Takhion Inc"
-          style={{
-            width: 34,
-            height: 34,
-            borderRadius: '100%',
-          }}
-        />
-      ),
-      plan: 'Free',
-    },
-  ],
+  // teams: [
+  //   {
+  //     name: 'Takhion Inc',
+  //     logo: () => (
+  //       <img
+  //         src={companyLogo}
+  //         alt="Takhion Inc"
+  //         style={{
+  //           width: 34,
+  //           height: 34,
+  //           borderRadius: '100%',
+  //         }}
+  //       />
+  //     ),
+  //     plan: 'Enterprise',
+  //   },
+  //   {
+  //     name: 'Acme Corp.',
+  //     logo: () => (
+  //       <img
+  //         src={companyLogo}
+  //         alt="Takhion Inc"
+  //         style={{
+  //           width: 34,
+  //           height: 34,
+  //           borderRadius: '100%',
+  //         }}
+  //       />
+  //     ),
+  //     plan: 'Startup',
+  //   },
+  //   {
+  //     name: 'Takhion Corp.',
+  //     logo: () => (
+  //       <img
+  //         src={companyLogo}
+  //         alt="Takhion Inc"
+  //         style={{
+  //           width: 34,
+  //           height: 34,
+  //           borderRadius: '100%',
+  //         }}
+  //       />
+  //     ),
+  //     plan: 'Free',
+  //   },
+  // ],
   navMain: [
     {
       moduleKey: 'kpis',
@@ -183,6 +188,12 @@ const data = {
       url: '/vision',
       icon: Camera,
     },
+    {
+      moduleKey: 'invitations',
+      title: 'Invitaciones',
+      url: '/invitations',
+      icon: UserPlus,
+    },
   ],
 };
 
@@ -198,21 +209,72 @@ export function AppSidebar({ ...props }: SidebarProps) {
     moduleVisibility[currentClient as keyof typeof moduleVisibility] ??
     moduleVisibility.default;
 
-  const visibleNavMain = data.navMain.filter((item) =>
-    visibleModules.includes(item.moduleKey as any)
-  );
+  const visibleNavMain =
+    currentClient === 'maf'
+      ? data.navMain.filter((item) =>
+        moduleVisibility.maf.includes(item.moduleKey as any)
+      )
+      : data.navMain.map((item) => ({
+        ...item,
+        disabled: !enabledModulesByClient.default.includes(
+          item.moduleKey as any
+        ),
+      }));
+  // return (
+  //   <Sidebar collapsible="icon" {...props}>
+  //     <SidebarHeader>
+  //       <TeamSwitcher teams={data.teams} />
+  //     </SidebarHeader>
+
+  //     <SidebarContent>
+  //       <NavMain items={visibleNavMain} />
+  //     </SidebarContent>
+
+  //     <SidebarFooter>
+  //       <NavUser user={data.user} />
+  //     </SidebarFooter>
+
+  //     <SidebarRail />
+  //   </Sidebar>
+  // );
+  const sidebarUser = {
+    name: currentUser?.name || data.user.name,
+    email: currentUser?.email || data.user.email,
+    avatar: data.user.avatar,
+  };
+
+  const organizationName = currentUser?.organizationName || 'Xapity';
+
+  const visibleNavMainByRole =
+    currentUser?.role === 'admin'
+      ? visibleNavMain
+      : visibleNavMain.filter((item) => item.moduleKey !== 'invitations');
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <div className="flex items-center gap-3 px-2 py-2">
+          <img
+            src={companyLogo}
+            alt={organizationName}
+            className="h-9 w-9 rounded-full object-cover"
+          />
+
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-semibold">{organizationName}</span>
+            <span className="truncate text-xs text-muted-foreground">
+              {currentUser?.role || 'usuario'}
+            </span>
+          </div>
+        </div>
       </SidebarHeader>
 
       <SidebarContent>
-        <NavMain items={visibleNavMain} />
+        <NavMain items={visibleNavMainByRole} />
       </SidebarContent>
 
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={sidebarUser} />
       </SidebarFooter>
 
       <SidebarRail />
