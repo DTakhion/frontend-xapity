@@ -9,15 +9,34 @@ import { NavLink, useNavigate } from 'react-router';
 import { Loader2, MailCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
+// const formSchema = z
+//   .object({
+//     name: z.string().min(3, 'Nombre requerido'),
+//     email: z.string().email('Correo inválido'),
+//     password: z.string().min(6, 'Mínimo 6 caracteres'),
+//     repassword: z.string(),
+//     phone: z.string().min(6, 'Teléfono requerido'),
+//     organizationName: z.string().min(3, 'Nombre requerido'),
+//     role: z.enum(['admin', 'staff', 'customer']),
+//   })
+//   .refine((data) => data.password === data.repassword, {
+//     message: 'Las contraseñas no coinciden',
+//     path: ['repassword'],
+//   });
+
 const formSchema = z
   .object({
     name: z.string().min(3, 'Nombre requerido'),
     email: z.string().email('Correo inválido'),
     password: z.string().min(6, 'Mínimo 6 caracteres'),
     repassword: z.string(),
-    phone: z.string().min(6, 'Teléfono requerido'),
-    organizationName: z.string().min(3, 'Nombre requerido'),
-    role: z.enum(['admin', 'staff', 'customer']),
+    phone: z
+      .string()
+      .regex(/^\+569\d{8}$/, 'Debe tener formato +569XXXXXXXX'),
+    organizationName: z
+      .string()
+      .trim()
+      .min(3, 'El nombre de la organización debe tener al menos 3 caracteres'),
   })
   .refine((data) => data.password === data.repassword, {
     message: 'Las contraseñas no coinciden',
@@ -43,7 +62,6 @@ export function SignupForm1() {
       repassword: '',
       phone: '',
       organizationName: '',
-      role: 'admin',
     },
   });
 
@@ -70,7 +88,7 @@ export function SignupForm1() {
               password: values.password,
               phone: values.phone,
               organizationName: values.organizationName,
-              role: values.role,
+              role: 'admin',
             }),
           }
         );
@@ -273,29 +291,16 @@ export function SignupForm1() {
           <ControlledFormField
             name="phone"
             label="Teléfono"
-            placeholder="+569..."
+            placeholder="+56912345678"
             type="text"
           />
 
           <ControlledFormField
             name="organizationName"
             label="Nombre organización"
-            placeholder="Mi empresa"
+            placeholder="Mínimo 3 caracteres"
             type="text"
           />
-
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Rol</label>
-
-            <select
-              {...form.register('role')}
-              className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
-            >
-              <option value="admin">Administrador</option>
-              <option value="staff">Staff</option>
-              <option value="customer">Cliente</option>
-            </select>
-          </div>
 
           <Button
             type="submit"
