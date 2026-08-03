@@ -8,11 +8,11 @@ import {
   CalendarDays,
   Users,
   ShieldCheck,
+  UserPlus,
+  House,
 } from 'lucide-react';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
-import { UserPlus } from 'lucide-react';
-//import { TeamSwitcher } from '@/components/team-switcher';
 import {
   Sidebar,
   SidebarContent,
@@ -20,7 +20,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/components/ui/sidebar';
-import companyLogo from '@/assets/images/company_02.png';
+//import xapityLogo from '@/assets/images/xapity-brain.png';
 import { getCurrentUser } from '@/lib/auth';
 
 //const CURRENT_CLIENT = 'maf';
@@ -35,68 +35,29 @@ const moduleVisibility = {
     'services',
     'staff',
     'schedule',
-    'vision',
+    'visión',
     'invitations',
   ],
 } as const;
 
 const enabledModulesByClient = {
-  default: ['xapity', 'xapity-maf', 'services', 'staff', 'schedule','invitations'],
+  default: ['xapity', 'services', 'staff', 'schedule', 'invitations'],
 } as const;
+
+const roleLabels: Record<string, string> = {
+  admin: 'Administrador',
+  staff: 'Colaborador',
+  customer: 'Cliente',
+  user: 'Usuario',
+};
 
 const data = {
   user: {
     name: 'Usuario',
     email: '',
-    avatar: '/avatars/shadcn.jpg',
+    avatar: '',
   },
-  // teams: [
-  //   {
-  //     name: 'Takhion Inc',
-  //     logo: () => (
-  //       <img
-  //         src={companyLogo}
-  //         alt="Takhion Inc"
-  //         style={{
-  //           width: 34,
-  //           height: 34,
-  //           borderRadius: '100%',
-  //         }}
-  //       />
-  //     ),
-  //     plan: 'Enterprise',
-  //   },
-  //   {
-  //     name: 'Acme Corp.',
-  //     logo: () => (
-  //       <img
-  //         src={companyLogo}
-  //         alt="Takhion Inc"
-  //         style={{
-  //           width: 34,
-  //           height: 34,
-  //           borderRadius: '100%',
-  //         }}
-  //       />
-  //     ),
-  //     plan: 'Startup',
-  //   },
-  //   {
-  //     name: 'Takhion Corp.',
-  //     logo: () => (
-  //       <img
-  //         src={companyLogo}
-  //         alt="Takhion Inc"
-  //         style={{
-  //           width: 34,
-  //           height: 34,
-  //           borderRadius: '100%',
-  //         }}
-  //       />
-  //     ),
-  //     plan: 'Free',
-  //   },
-  // ],
+
   navMain: [
     {
       moduleKey: 'kpis',
@@ -205,38 +166,20 @@ export function AppSidebar({ ...props }: SidebarProps) {
   const currentClient =
     currentUser?.businessId === 'maf' ? 'maf' : 'default';
 
-  const visibleModules =
-    moduleVisibility[currentClient as keyof typeof moduleVisibility] ??
-    moduleVisibility.default;
-
   const visibleNavMain =
     currentClient === 'maf'
       ? data.navMain.filter((item) =>
         moduleVisibility.maf.includes(item.moduleKey as any)
       )
-      : data.navMain.map((item) => ({
-        ...item,
-        disabled: !enabledModulesByClient.default.includes(
-          item.moduleKey as any
-        ),
-      }));
-  // return (
-  //   <Sidebar collapsible="icon" {...props}>
-  //     <SidebarHeader>
-  //       <TeamSwitcher teams={data.teams} />
-  //     </SidebarHeader>
+      : data.navMain
+        .filter((item) => item.moduleKey !== 'xapity-maf')
+        .map((item) => ({
+          ...item,
+          disabled: !enabledModulesByClient.default.includes(
+            item.moduleKey as any
+          ),
+        }));
 
-  //     <SidebarContent>
-  //       <NavMain items={visibleNavMain} />
-  //     </SidebarContent>
-
-  //     <SidebarFooter>
-  //       <NavUser user={data.user} />
-  //     </SidebarFooter>
-
-  //     <SidebarRail />
-  //   </Sidebar>
-  // );
   const sidebarUser = {
     name: currentUser?.name || data.user.name,
     email: currentUser?.email || data.user.email,
@@ -244,6 +187,9 @@ export function AppSidebar({ ...props }: SidebarProps) {
   };
 
   const organizationName = currentUser?.organizationName || 'Xapity';
+
+  const roleLabel =
+    roleLabels[currentUser?.role || 'user'] || 'Usuario';
 
   const visibleNavMainByRole =
     currentUser?.role === 'admin'
@@ -254,16 +200,14 @@ export function AppSidebar({ ...props }: SidebarProps) {
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <div className="flex items-center gap-3 px-2 py-2">
-          <img
-            src={companyLogo}
-            alt={organizationName}
-            className="h-9 w-9 rounded-full object-cover"
-          />
+          <div className="flex h-9 w-9 items-center justify-center rounded-md bg-sidebar-accent">
+            <House className="h-5 w-5" />
+          </div>
 
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-semibold">{organizationName}</span>
             <span className="truncate text-xs text-muted-foreground">
-              {currentUser?.role || 'usuario'}
+              {roleLabel}
             </span>
           </div>
         </div>

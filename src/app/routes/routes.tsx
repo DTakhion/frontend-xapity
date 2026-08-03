@@ -16,6 +16,8 @@ import { SegmentacionCanastasPage } from '@/app/clients/segmentacion-canastas-pa
 
 import XapityPage from '@/app/xapity/xapity-page';
 import XapityMafPage from '@/app/xapity-maf/xapity-maf-page';
+import AccountPage from '@/app/account/account-page';
+import SupportPage from '@/app/support/support-page';
 
 import ServicesPage from '../xapity/services-page';
 import StaffPage from '@/app/xapity/staff-page';
@@ -49,6 +51,8 @@ export const router = createBrowserRouter([
 
       { path: 'xapity', Component: XapityPage },
       { path: 'xapity-maf', Component: XapityMafPage },
+      { path: 'account', Component: AccountPage },
+      { path: 'support', Component: SupportPage },
 
       { path: 'services', Component: ServicesPage },
       { path: 'staff', Component: StaffPage },
