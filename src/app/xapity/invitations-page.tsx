@@ -19,7 +19,7 @@ export default function InvitationsPage() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: '',
-      role: 'user',
+      role: 'staff',
     },
   });
 
@@ -59,7 +59,7 @@ export default function InvitationsPage() {
       success: (data) => {
         form.reset({
           email: '',
-          role: 'user',
+          role: 'staff',
         });
 
         return {
@@ -114,7 +114,7 @@ export default function InvitationsPage() {
                   {...form.register('role')}
                   className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
                 >
-                  <option value="staff">Staff</option>
+                  <option value="staff">Colaborador</option>
                   <option value="admin">Administrador</option>
                 </select>
               </div>

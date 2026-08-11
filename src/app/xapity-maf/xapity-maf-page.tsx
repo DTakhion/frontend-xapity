@@ -2,8 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   Bot,
   FileText,
-  Gift,
-  HeartHandshake,
   Loader2,
   Send,
   ShieldCheck,
@@ -65,19 +63,23 @@ export default function XapityMafPage() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const bottomRef = useRef<HTMLDivElement | null>(null);
+  const messagesRef = useRef<HTMLDivElement | null>(null);
 
   const suggestions = [
     "¿Qué beneficios existen para nacimiento de un hijo?",
     "¿Cuáles son los requisitos para solicitar un bono?",
-    "¿Qué documentos debo presentar para acceder a un beneficio?",
-    "¿Existe algún beneficio relacionado con salud?",
-    "¿Qué beneficios aplican para trabajadores con contrato vigente?",
     "Resume los principales beneficios disponibles.",
   ];
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = messagesRef.current;
+
+    if (!container) return;
+
+    container.scrollTo({
+      top: container.scrollHeight,
+      behavior: "smooth",
+    });
   }, [messages, loading]);
 
   const sendPrompt = async (customPrompt?: string) => {
@@ -230,65 +232,48 @@ export default function XapityMafPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-2rem)] bg-slate-50 px-4 py-6">
+    <div className="min-h-0 bg-slate-50 px-4 py-6">
       <div className="mx-auto flex max-w-6xl flex-col gap-6">
-        <section className="rounded-3xl border bg-white p-6 shadow-sm">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-            <div>
-              <div className="flex items-center gap-2 text-sm font-medium text-slate-500">
-                <Sparkles className="h-4 w-4" />
-                Xapity MAF · Conversational RAG
-              </div>
 
-              <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">
-                Asistente inteligente de beneficios MAF Chile
-              </h1>
-
-              <p className="mt-2 max-w-2xl text-sm text-slate-500">
-                Consulta beneficios, requisitos, condiciones y documentos usando
-                lenguaje natural. Las respuestas se generan desde el contexto
-                documental disponible.
-              </p>
-            </div>
-
-            <div className="rounded-2xl border bg-slate-50 px-4 py-3 text-sm">
-              <div className="font-semibold text-slate-900">
-                Endpoint activo
-              </div>
-              <div className="mt-1 font-mono text-xs text-slate-500">
-                POST /xapity-maf/chat
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="grid gap-6 lg:grid-cols-[1fr_320px]">
-          <div className="flex h-[68vh] flex-col rounded-3xl border bg-white shadow-sm">
+        <section className="grid min-h-0 flex-1 gap-6 lg:grid-cols-[1fr_320px]">
+          <div className="flex h-[calc(100vh-8rem)] min-h-0 flex-col rounded-3xl border bg-white shadow-sm">
             <div className="border-b px-5 py-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-black text-white">
-                  <Bot className="h-5 w-5" />
-                </div>
-
-                <div>
-                  <div className="font-semibold text-slate-950">
-                    Chat Xapity MAF
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-black text-white">
+                    <Bot className="h-5 w-5" />
                   </div>
-                  <div className="text-xs text-slate-500">
-                    Respuestas conectadas al backend FastAPI protegido
+
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <div className="font-semibold text-slate-950">
+                        Xapity MAF
+                      </div>
+
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-50 px-2.5 py-1 text-xs font-medium text-slate-700 ring-1 ring-slate-200">
+                        <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                        Activo
+                      </span>
+                    </div>
+
+                    <div className="mt-0.5 text-xs text-slate-500">
+                      Asistente inteligente de beneficios · Conversación protegida
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-5 py-5">
+            <div
+              ref={messagesRef}
+              className="min-h-0 flex-1 overflow-y-auto px-5 py-5"
+            >
               <div className="space-y-5">
                 {messages.map((msg) => (
                   <div
                     key={msg.id}
-                    className={`flex gap-3 ${
-                      msg.role === "user" ? "justify-end" : "justify-start"
-                    }`}
+                    className={`flex gap-3 ${msg.role === "user" ? "justify-end" : "justify-start"
+                      }`}
                   >
                     {msg.role === "assistant" && (
                       <div className="mt-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100">
@@ -297,11 +282,10 @@ export default function XapityMafPage() {
                     )}
 
                     <div
-                      className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                        msg.role === "user"
-                          ? "bg-black text-white"
-                          : "border bg-slate-50 text-slate-800"
-                      }`}
+                      className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${msg.role === "user"
+                        ? "bg-black text-white"
+                        : "border bg-slate-50 text-slate-800"
+                        }`}
                     >
                       <div>{msg.content}</div>
 
@@ -334,7 +318,6 @@ export default function XapityMafPage() {
                   </div>
                 )}
 
-                <div ref={bottomRef} />
               </div>
             </div>
 
@@ -388,57 +371,33 @@ export default function XapityMafPage() {
                 ))}
               </div>
             </div>
-
             <div className="rounded-3xl border bg-white p-5 shadow-sm">
               <div className="font-semibold text-slate-950">
-                Capacidades MVP
+                Información y seguridad
               </div>
 
               <div className="mt-4 space-y-3 text-sm text-slate-600">
                 <div className="flex gap-3">
-                  <Gift className="mt-0.5 h-4 w-4" />
-                  <span>Consultar beneficios disponibles.</span>
+                  <FileText className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>
+                    Respuestas basadas en documentación oficial disponible de MAF.
+                  </span>
                 </div>
 
                 <div className="flex gap-3">
-                  <FileText className="mt-0.5 h-4 w-4" />
-                  <span>Responder con contexto documental recuperado.</span>
+                  <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>
+                    Acceso exclusivo para usuarios MAF autorizados.
+                  </span>
                 </div>
 
                 <div className="flex gap-3">
-                  <HeartHandshake className="mt-0.5 h-4 w-4" />
-                  <span>Orientar sobre requisitos, condiciones y documentos.</span>
+                  <Sparkles className="mt-0.5 h-4 w-4 shrink-0" />
+                  <span>
+                    Las respuestas incluyen sus fuentes de respaldo.
+                  </span>
                 </div>
               </div>
-            </div>
-
-            <div className="rounded-3xl border bg-white p-5 shadow-sm">
-              <div className="font-semibold text-slate-950">
-                Control de respuesta
-              </div>
-
-              <div className="mt-4 space-y-3 text-sm text-slate-600">
-                <div className="flex gap-3">
-                  <ShieldCheck className="mt-0.5 h-4 w-4" />
-                  <span>Acceso restringido a usuarios MAF autorizados.</span>
-                </div>
-
-                <div className="flex gap-3">
-                  <Sparkles className="mt-0.5 h-4 w-4" />
-                  <span>Muestra confianza, coincidencias y fuentes usadas.</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-3xl border bg-slate-950 p-5 text-white shadow-sm">
-              <div className="text-sm font-semibold">
-                Estado del asistente
-              </div>
-
-              <p className="mt-2 text-sm text-slate-300">
-                Esta versión consume el endpoint protegido de MAF y responde
-                usando recuperación semántica sobre el manual cargado.
-              </p>
             </div>
           </aside>
         </section>

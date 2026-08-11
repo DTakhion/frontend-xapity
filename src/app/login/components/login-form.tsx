@@ -58,9 +58,10 @@ export function LoginForm({ className, ...props }: DivProps) {
       await toast.promise(loginUser, {
         loading: 'Ingresando...',
         success: () => {
-          navigate('/xapity');
+          navigate('/account', { replace: true });
+
           return {
-            message: 'Bienvenido!',
+            message: '¡Bienvenido!',
             description: 'Acceso correcto a Xapity',
           };
         },
