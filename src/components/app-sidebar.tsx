@@ -32,6 +32,7 @@ const moduleVisibility = {
     'campaigns',
     'clients',
     'xapity',
+    'xapity-luca',
     'services',
     'staff',
     'schedule',
@@ -41,7 +42,7 @@ const moduleVisibility = {
 } as const;
 
 const enabledModulesByClient = {
-  default: ['xapity', 'services', 'staff', 'schedule', 'invitations'],
+  default: ['xapity', 'xapity-luca', 'services', 'staff', 'schedule', 'invitations'],
 } as const;
 
 const roleLabels: Record<string, string> = {
@@ -118,6 +119,12 @@ const data = {
       title: 'Xapity',
       url: '/xapity',
       icon: Bot,
+    },
+    {
+      moduleKey: 'xapity-luca',
+      title: 'Xapity Luca',
+      url: '/xapity-luca',
+      icon: ChartLine,
     },
     {
       moduleKey: 'xapity-maf',
